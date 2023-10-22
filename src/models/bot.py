@@ -6,6 +6,7 @@ from discord import Message
 from discord.ext import commands
 
 from .cache import Cache
+from .anti_raid import AntiRaid
 
 
 class KowayBot(commands.Bot):
@@ -18,7 +19,8 @@ class KowayBot(commands.Bot):
         self.message_count = 0
         
         self.start_time: datetime.datetime = None   # type: ignore
-        
+        self.anti_raid_system = AntiRaid(self)
+
     async def start(self, token: str, *, reconnect: bool = True):
         self.start_time = datetime.datetime.utcnow()
         self.cache = Cache()
