@@ -4,21 +4,21 @@ from typing import Any, Union
 from dataclasses import dataclass, field
 
 
-@dataclass(repr=True)
+@dataclass(repr=True, slots=True)
 class Cache:
     storage: dict[int, Any] = field(default_factory=dict)
-    
+
     def get_key(self, key: int):
         return self.storage.get(key)
-    
+
     def insert_key(self, key: int, value: Any):
         self.storage[key] = value
-        
+
     def __len__(self):
         return len(self.storage)
 
 
-@dataclass(repr=True)
+@dataclass(repr=True, slots=True)
 class MemberCache:
     ids: list[int] = field(default_factory=list)
     dt_join: list[datetime.datetime] = field(default_factory=list)
@@ -29,6 +29,12 @@ class MemberCache:
 
     def get_ids(self) -> list[int]:
         return self.ids
+
+    def put_dt_join_time(self, value: datetime.datetime):
+        self.dt_join.append(value)
+
+    def put_dt_creation_time(self, value: datetime.datetime):
+        self.dt_creation.append(value)
 
     @staticmethod
     def get_rough_join_time(
@@ -74,11 +80,15 @@ class MemberCache:
         ]
 
 
+@dataclass(repr=True, slots=True)
 class GuildCache:
     guilds: dict[int, dict[str, Union[MemberCache, Cache]]] = field(default_factory=dict)
 
-    def get_guild(self, _id: int):
-        return self.guilds.get(_id)
+    def get_guild(self, key: int):
+        return self.guilds.get(key)
 
-    def put_guild(self, _id: int):
-        self.guilds[_id] = {}
+    def put_guild(self, key: int, value: dict[str, Union[MemberCache, Cache]]):
+        self.guilds[key] = value
+
+    def __contains__(self, item: int) -> bool:
+        return item in self.guilds
